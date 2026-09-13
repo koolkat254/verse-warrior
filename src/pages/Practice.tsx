@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Link, NavLink, useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { WordHints, Typing } from '../components/Exercises';
 import { Recall } from '../components/Recall';
 import { Recovery, Scripture } from '../components/ui';
@@ -15,6 +15,11 @@ const modes = [
   { id: 'type', title: 'Type' },
   { id: 'reference', title: 'Reference' },
 ];
+const progressiveModes: Record<string, { id: string; title: string } | undefined> = {
+  read: { id: 'hide', title: 'Make it harder' },
+  hide: { id: 'letters', title: 'Use first letters' },
+  letters: { id: 'type', title: 'Type from memory' },
+};
 function PracticeContent({ passage, mode }: { passage: Passage; mode: string }) {
   const { state, act } = useApp();
   const [referenceVisible, setReferenceVisible] = useState(false),
@@ -26,6 +31,7 @@ function PracticeContent({ passage, mode }: { passage: Passage; mode: string }) 
     );
   }, [act, passage.id]);
   const review = state.passageProgress[passage.id]?.review;
+  const nextMode = progressiveModes[mode];
   if (mode === 'enroll')
     return expected === 'null' ? (
       <Recall passage={passage} expected={expected} enrollment />
@@ -58,16 +64,6 @@ function PracticeContent({ passage, mode }: { passage: Passage; mode: string }) 
             : 'Start with the words. Gradually give your memory more room.'}
         </p>
       </div>
-      <nav className="mode-tabs" aria-label="Practice tools">
-        {modes.map((item, i) => (
-          <NavLink key={item.id} to={`/practice/${passage.id}/${item.id}`}>
-            <span className="step-number" aria-hidden="true">
-              {i + 1}
-            </span>
-            {item.title}
-          </NavLink>
-        ))}
-      </nav>
       {error && <p role="alert">{error}</p>}
       <section className="panel practice-panel">
         {mode === 'read' && <Scripture passage={passage} />}
@@ -99,15 +95,34 @@ function PracticeContent({ passage, mode }: { passage: Passage; mode: string }) 
             ? `In review · Next due ${dateLabel(review.dueDate)}. Extra practice won’t change this date.`
             : 'Feeling ready? Try recalling the passage and begin spaced review.'}
         </p>
-        {!review && (
-          <Link className="button primary" to={`/practice/${passage.id}/enroll`}>
-            Ready to review <span aria-hidden="true">→</span>
+        {nextMode ? (
+          <Link className="button primary" to={`/practice/${passage.id}/${nextMode.id}`}>
+            {nextMode.title} <span aria-hidden="true">→</span>
           </Link>
-        )}
+        ) : !review ? (
+          <Link className="button primary" to={`/practice/${passage.id}/enroll`}>
+            Test recall & start review <span aria-hidden="true">→</span>
+          </Link>
+        ) : null}
       </div>
-      <p className="small muted">
-        Every tool is optional. Repeat a step, switch tools, or come back later.
-      </p>
+      <details className="practice-options">
+        <summary>Practice options</summary>
+        <p>
+          Choose a tool, repeat one, or test the reference. Extra practice does not change review
+          dates.
+        </p>
+        <nav aria-label="Practice tools">
+          {modes.map((item) => (
+            <Link
+              key={item.id}
+              className={item.id === mode ? 'active' : ''}
+              to={`/practice/${passage.id}/${item.id}`}
+            >
+              {item.title}
+            </Link>
+          ))}
+        </nav>
+      </details>
     </>
   );
 }

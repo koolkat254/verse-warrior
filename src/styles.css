@@ -362,26 +362,10 @@ svg {
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
 }
-.next-passage {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  text-decoration: none;
-}
-.next-passage h3 {
-  font-family: Georgia, serif;
-  font-size: 1.7rem;
-  font-weight: 400;
-  margin-bottom: 4px;
-}
-.next-passage p:last-child {
-  font-size: 0.82rem;
+.focus-line {
+  margin: 18px 0 0;
+  font-size: 0.8rem;
   color: var(--muted);
-  margin: 0;
-}
-.next-passage:hover {
-  border-color: #9caf93;
 }
 .title-link {
   display: flex;
@@ -576,37 +560,6 @@ progress::-moz-progress-bar {
 .practice-heading > p:last-child {
   color: var(--muted);
 }
-.mode-tabs {
-  display: flex;
-  gap: 6px;
-  padding: 6px;
-  background: #eaf0e5;
-  border-radius: 12px;
-  margin-bottom: 24px;
-  overflow-x: auto;
-}
-.mode-tabs a {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  white-space: nowrap;
-  font-size: 0.79rem;
-  padding: 12px 10px;
-  text-decoration: none;
-  border-radius: 8px;
-  min-height: 44px;
-}
-.mode-tabs a.active {
-  background: var(--paper);
-  box-shadow: 0 1px 4px #263d3510;
-  font-weight: 600;
-}
-.step-number {
-  font-size: 0.66rem;
-  color: #718366;
-}
 .practice-panel {
   padding: 36px;
 }
@@ -640,6 +593,46 @@ progress::-moz-progress-bar {
 }
 .practice-footer .button {
   flex-shrink: 0;
+}
+.practice-options {
+  margin-top: 8px;
+  border-top: 1px solid var(--line);
+  padding-top: 16px;
+}
+.practice-options summary {
+  color: var(--green);
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.practice-options > p {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin: 4px 0 14px;
+}
+.practice-options nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.practice-options nav a {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  color: var(--green);
+  font-size: 0.78rem;
+  text-decoration: none;
+}
+.practice-options nav a:hover,
+.practice-options nav a.active {
+  background: #e9eee5;
+  border-color: #aabd9d;
 }
 .exercise-controls {
   display: flex;
@@ -800,6 +793,12 @@ textarea::placeholder {
 .recall-prompt > .button {
   display: flex;
   margin: 22px auto 0;
+}
+.shortcut-hint {
+  color: var(--muted);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  margin: 12px 0 0;
 }
 .recall-prompt .input-label {
   text-align: left;
@@ -1128,16 +1127,11 @@ dd {
     align-items: flex-start;
     gap: 18px;
   }
-  .mode-tabs {
-    margin-left: -4px;
-    margin-right: -4px;
-  }
-  .mode-tabs a {
-    font-size: 0.73rem;
-    padding: 12px 10px;
-  }
-  .step-number {
-    display: none;
+  .primary-action {
+    position: sticky;
+    bottom: 12px;
+    z-index: 2;
+    box-shadow: 0 6px 20px #1b3b3230;
   }
   .rating-buttons {
     grid-template-columns: 1fr;

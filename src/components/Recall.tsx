@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import type { Passage, Rating } from '../domain/types';
 import { useApp } from '../state/context';
@@ -27,18 +27,53 @@ export function Recall({
     [pending, setPending] = useState(false),
     [error, setError] = useState('');
   const review = state.passageProgress[passage.id]?.review;
-  async function submit(value: Rating) {
-    setPending(true);
-    setError('');
-    try {
-      await act({ type: 'rate', id: passage.id, rating: value, expected, now: new Date() });
-      setRating(value);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Your rating could not be applied.');
-    } finally {
-      setPending(false);
+  const submit = useCallback(
+    async (value: Rating) => {
+      setPending(true);
+      setError('');
+      try {
+        await act({ type: 'rate', id: passage.id, rating: value, expected, now: new Date() });
+        setRating(value);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Your rating could not be applied.');
+      } finally {
+        setPending(false);
+      }
+    },
+    [act, expected, passage.id],
+  );
+  useEffect(() => {
+    function isTypingTarget(target: EventTarget | null) {
+      return (
+        target instanceof HTMLInputElement ||
+        target instanceof HTMLTextAreaElement ||
+        target instanceof HTMLSelectElement ||
+        (target instanceof HTMLElement && target.isContentEditable)
+      );
     }
-  }
+    function onKeyDown(event: KeyboardEvent) {
+      if (isTypingTarget(event.target) || event.altKey || event.ctrlKey || event.metaKey) return;
+      if (!revealed && (event.key === ' ' || event.key === 'Enter')) {
+        event.preventDefault();
+        setRevealed(true);
+        return;
+      }
+      if (revealed && !rating) {
+        const shortcuts: Record<string, Rating> = { '1': 'remembered', '2': 'help', '3': 'forgot' };
+        if (shortcuts[event.key] && !pending && !error) {
+          event.preventDefault();
+          void submit(shortcuts[event.key]);
+        }
+        return;
+      }
+      if (rating && !enrollment && (event.key === ' ' || event.key === 'Enter')) {
+        event.preventDefault();
+        onNext?.();
+      }
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [enrollment, error, onNext, pending, rating, revealed, submit]);
   return (
     <>
       <div className="recall-heading">
@@ -58,6 +93,7 @@ export function Recall({
             <br />
             Then reveal the text and check your recall.
           </p>
+          {!typing && <p className="shortcut-hint">Press Space or Enter to reveal.</p>}
           {typing ? (
             <>
               <label className="input-label" htmlFor="recall-attempt">
@@ -80,7 +116,11 @@ export function Recall({
               I’d like to type it instead
             </button>
           )}
-          <button className="button primary" onClick={() => setRevealed(true)}>
+          <button
+            className="button primary primary-action"
+            autoFocus
+            onClick={() => setRevealed(true)}
+          >
             {typing ? 'Reveal and compare' : 'Reveal passage'}
           </button>
         </section>
@@ -117,7 +157,12 @@ export function Recall({
                   Back to Today
                 </Link>
               ) : (
-                <button className="button primary" onClick={onNext}>
+                <button
+                  className="button primary"
+                  autoFocus
+                  aria-keyshortcuts="Enter Space"
+                  onClick={onNext}
+                >
                   {last ? 'Finish review' : 'Next passage'}
                 </button>
               )}
@@ -126,6 +171,7 @@ export function Recall({
             <section className="rating-section">
               <h2>How did you remember it?</h2>
               <p>Choose what reflects your recall before revealing the passage.</p>
+              <p className="shortcut-hint">Keyboard: 1 remembered · 2 needed help · 3 forgot</p>
               <div className="rating-buttons">
                 {(
                   [
@@ -141,6 +187,9 @@ export function Recall({
                   <button
                     disabled={pending || !!error}
                     key={option.value}
+                    aria-keyshortcuts={
+                      option.value === 'remembered' ? '1' : option.value === 'help' ? '2' : '3'
+                    }
                     onClick={() => {
                       void submit(option.value);
                     }}

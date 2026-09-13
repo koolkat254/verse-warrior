@@ -6,13 +6,17 @@ import { duePassageIds } from '../domain/scheduler';
 import { reviewSignature } from '../domain/state';
 import { useApp } from '../state/context';
 
+export const REVIEW_BATCH_SIZE = 5;
+
 export function ReviewSession() {
   const { catalog, state, now, warning } = useApp();
   const [queue] = useState(() =>
-    duePassageIds(catalog, state, now).map((id) => ({
-      id,
-      expected: reviewSignature(state.passageProgress[id]?.review),
-    })),
+    duePassageIds(catalog, state, now)
+      .slice(0, REVIEW_BATCH_SIZE)
+      .map((id) => ({
+        id,
+        expected: reviewSignature(state.passageProgress[id]?.review),
+      })),
   );
   const [index, setIndex] = useState(0);
   const current = queue[index];
@@ -39,7 +43,7 @@ export function ReviewSession() {
         <span>
           Passage {index + 1} of {queue.length}
         </span>
-        <span>You can stop anytime</span>
+        <span>Up to {REVIEW_BATCH_SIZE} at a time · You can stop anytime</span>
         <progress value={index} max={queue.length} aria-label="Review session progress" />
       </div>
       <Recall

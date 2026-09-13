@@ -41,13 +41,14 @@ Edit `src/content/catalog.json`. See [the content authoring guide](docs/content-
 
 ## Product behavior
 
-- Today combines due reviews from all active collections; a separate learning focus chooses the next new passage.
+- Today has one **Start practice** action. It resumes due reviews first; otherwise it resumes the latest unfinished passage in the selected learning focus, then starts the next new passage.
 - Collections can be flat, organized into weeks, or organized into books with optional weeks. Nothing is locked to a calendar or course brand.
 - Practice tools are optional and never automatically award mastery.
 - “Ready to review” requires an initial recall rating and schedules tomorrow. Subsequent reviews use 1, 3, 7, 14, 30, and 60-day intervals.
 - Remembered advances one interval; Needed help moves back one; Forgot resets to one day.
 - Mastery requires three consecutive successful scheduled reviews, including an interval of at least seven days. Either unsuccessful rating removes mastery. Reviews continue after mastery.
 - Pausing preserves dates. Identical passage IDs share progress across collections.
+- Review sessions present up to five passages at a time. On a physical keyboard, Space or Enter reveals and advances; `1`, `2`, and `3` select Remembered, Needed help, and Forgot. Shortcuts never apply while typing.
 
 ## Progress and recovery
 
@@ -82,5 +83,3 @@ Local development commands do not deploy or change repository visibility. Real l
 ## Next version
 
 PWA installation and reliable offline startup are deferred. The next milestone adds a manifest, icons, service-worker caching for app and catalog, and an update prompt that waits until practice ends. Custom collections follow later. Version 1 has no streaks, historical charts, notifications, authentication, or backend services.
-
-

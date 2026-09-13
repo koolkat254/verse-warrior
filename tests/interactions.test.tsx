@@ -58,6 +58,24 @@ describe('learning interactions', () => {
     ).toBe(0);
     expect(localStorage.getItem(STORAGE_KEY)).toContain('practice-one');
   });
+  it('supports fast recall shortcuts without capturing keyboard input', async () => {
+    const store = app('/practice/practice-one/enroll');
+    await userEvent.keyboard(' ');
+    expect(screen.getByRole('button', { name: /Remembered/ })).toBeInTheDocument();
+    await userEvent.keyboard('1');
+    await waitFor(() =>
+      expect(store.snapshot.state.passageProgress['practice-one'].review?.lastRating).toBe(
+        'remembered',
+      ),
+    );
+    const typingStore = app('/practice/practice-two/enroll');
+    await userEvent.click(screen.getByRole('button', { name: 'I’d like to type it instead' }));
+    const input = screen.getByLabelText('Your recall attempt');
+    await userEvent.click(input);
+    await userEvent.keyboard('1 ');
+    expect(input).toHaveValue('1 ');
+    expect(typingStore.snapshot.state.passageProgress['practice-two'].review).toBeNull();
+  });
   it('provides recovery for unknown routes', () => {
     app('/practice/missing/read');
     expect(screen.getByRole('link', { name: 'Go to Collections' })).toBeInTheDocument();

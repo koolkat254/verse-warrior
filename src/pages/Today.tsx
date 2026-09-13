@@ -13,8 +13,19 @@ export function Today() {
     (c) => c.id === state.learningFocus?.collectionId,
   );
   const group = focusCollection && findGroup(focusCollection, state.learningFocus?.groupId);
-  const nextId = group && flatten(group).find((id) => !state.passageProgress[id]?.review);
+  const learningIds = group
+    ? flatten(group).filter((id) => !state.passageProgress[id]?.review)
+    : [];
+  const resumedId = [...learningIds]
+    .filter((id) => state.passageProgress[id])
+    .sort((first, second) =>
+      state.passageProgress[second].lastPracticedAt.localeCompare(
+        state.passageProgress[first].lastPracticedAt,
+      ),
+    )[0];
+  const nextId = resumedId ?? learningIds[0];
   const next = catalog.passages.find((p) => p.id === nextId);
+  const practiceTarget = due.length ? '/review' : next ? `/practice/${next.id}/read` : null;
   const nextDue = activePassageIds(catalog, state)
     .map((id) => state.passageProgress[id]?.review?.dueDate)
     .filter((d): d is string => !!d)
@@ -53,68 +64,48 @@ export function Today() {
         <>
           <section className="review-hero">
             <div>
-              <p className="eyebrow">Today’s review</p>
+              <p className="eyebrow">Your next step</p>
               <h2>
                 {due.length ? (
                   <>
                     <span className="due-number">{due.length}</span>{' '}
-                    {due.length === 1 ? 'passage is' : 'passages are'} ready.
+                    {due.length === 1 ? 'passage is' : 'passages are'} ready to recall.
                   </>
+                ) : next ? (
+                  next.reference
                 ) : (
                   'You’re caught up.'
                 )}
               </h2>
               <p>
                 {due.length
-                  ? 'Recall what you know, check the words, and take the next step. You can stop whenever you need.'
-                  : nextDue
-                    ? `Your next review is ${dateLabel(nextDue)}. There’s room to learn something new.`
-                    : 'Your review rhythm begins when you mark a passage ready.'}
+                  ? 'Start with one passage. Your session will keep moving until you choose to stop.'
+                  : next && focusCollection
+                    ? `${resumedId ? 'Pick up where you left off' : 'Begin something new'} from ${focusCollection.title}${group && group !== focusCollection ? ` · ${group.title}` : ''}.`
+                    : nextDue
+                      ? `Your next review is ${dateLabel(nextDue)}. Choose a learning focus to continue.`
+                      : 'Your review rhythm begins when you mark a passage ready.'}
               </p>
-              {due.length > 0 && (
-                <Link to="/review" className="button primary">
-                  Start review <Icon name="arrow" />
+              {practiceTarget ? (
+                <Link to={practiceTarget} className="button primary">
+                  Start practice <Icon name="arrow" />
+                </Link>
+              ) : (
+                <Link to="/collections" className="button primary">
+                  Choose a focus <Icon name="arrow" />
                 </Link>
               )}
             </div>
             <Icon name="sun" size={64} />
           </section>
-          <section className="section">
-            <div className="section-heading">
-              <h2>Keep learning</h2>
-              <Link to={focusCollection ? `/collections/${focusCollection.id}` : '/collections'}>
-                Change focus
-              </Link>
-            </div>
-            {next && focusCollection ? (
-              <Link className="panel next-passage" to={`/practice/${next.id}/read`}>
-                <div>
-                  <p className="eyebrow">
-                    {focusCollection.title}
-                    {group && group !== focusCollection ? ` · ${group.title}` : ''}
-                  </p>
-                  <h3>{next.reference}</h3>
-                  <p>
-                    {next.translation} ·{' '}
-                    {state.passageProgress[next.id] ? 'Continue learning' : 'Your next passage'}
-                  </p>
-                </div>
-                <Icon name="arrow" />
-              </Link>
-            ) : (
-              <div className="panel">
-                <h3>{group ? 'Every passage here is in review.' : 'Choose where to grow next.'}</h3>
-                <p>
-                  {group
-                    ? 'Keep your review rhythm, or choose another group when you’re ready.'
-                    : 'Select a collection, book, or week as your learning focus.'}
-                </p>
-                <Link className="button" to="/collections">
-                  Explore collections
-                </Link>
-              </div>
-            )}
-          </section>
+          <p className="focus-line">
+            {focusCollection
+              ? `Learning focus: ${focusCollection.title}${group && group !== focusCollection ? ` · ${group.title}` : ''}.`
+              : 'Choose a collection, book, or week as your learning focus.'}{' '}
+            <Link to={focusCollection ? `/collections/${focusCollection.id}` : '/collections'}>
+              Change
+            </Link>
+          </p>
           <section className="section">
             <div className="section-heading">
               <h2>Your collections</h2>

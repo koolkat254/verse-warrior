@@ -53,18 +53,19 @@ test('choose a collection, learn, enroll, refresh, and navigate with Back', asyn
   await expect(
     page.getByText('Steady practice builds lasting memory.', { exact: false }),
   ).toBeVisible();
-  await page.getByRole('link', { name: 'Hide words', exact: false }).click();
+  await page.getByRole('link', { name: 'Make it harder' }).click();
   await page.getByRole('button', { name: '100%' }).click();
   await expect(page.locator('.hinted-text')).not.toContainText('Steady');
   await page.getByRole('button', { name: 'Reveal word 1', exact: true }).click();
   await expect(page.locator('.hinted-text')).toContainText('Steady');
-  await page.getByRole('link', { name: 'Type', exact: false }).click();
+  await page.getByRole('link', { name: 'Use first letters' }).click();
+  await page.getByRole('link', { name: 'Type from memory' }).click();
   await page
     .getByLabel('Type the passage from memory')
     .fill('Steady practice builds memory. Return with patience and begin again.');
   await page.getByRole('button', { name: 'Compare attempt' }).click();
   await expect(page.getByRole('region', { name: 'Attempt comparison' })).toContainText('lasting');
-  await page.getByRole('link', { name: 'Ready to review' }).click();
+  await page.getByRole('link', { name: 'Test recall & start review' }).click();
   await expect(page.getByRole('button', { name: /Remembered/ })).toHaveCount(0);
   await page.getByRole('button', { name: 'Reveal passage' }).click();
   await page.getByRole('button', { name: /Remembered/ }).click();
@@ -72,13 +73,13 @@ test('choose a collection, learn, enroll, refresh, and navigate with Back', asyn
   await page.reload();
   expect((await stored(page)).passageProgress['practice-one'].review.dueDate).toBe('2026-01-13');
   await page.getByRole('link', { name: 'Back to Today' }).click();
-  await expect(page.getByRole('heading', { name: 'You’re caught up.' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Practice 1:2–3' })).toBeVisible();
   await page.goBack();
   await expect(page.getByText('Already in your review rhythm.')).toBeVisible();
 });
 test('due queue deduplicates, awards mastery, and resumes unfinished reviews', async ({ page }) => {
   await seedDue(page);
-  await page.getByRole('link', { name: 'Start review' }).click();
+  await page.getByRole('link', { name: 'Start practice' }).click();
   await expect(page.getByText('Passage 1 of 2')).toBeVisible();
   await page.getByRole('button', { name: 'Reveal passage' }).click();
   await page.getByRole('button', { name: /Remembered/ }).click();
@@ -128,6 +129,23 @@ test('reference answer stays concealed and narrow layouts do not overflow', asyn
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
+});
+test('keyboard shortcuts reveal, rate, and advance a review without affecting typed attempts', async ({
+  page,
+}) => {
+  await seedDue(page);
+  await page.getByRole('link', { name: 'Start practice' }).click();
+  await expect(page.getByRole('button', { name: 'Reveal passage' })).toBeFocused();
+  await page.keyboard.press('Space');
+  await expect(page.getByRole('button', { name: /Remembered/ })).toBeVisible();
+  await page.keyboard.press('1');
+  await expect(page.getByText('A little stronger each time.')).toBeVisible();
+  await page.keyboard.press('Enter');
+  await expect(page.getByText('Passage 2 of 2')).toBeVisible();
+  await page.getByRole('button', { name: 'I’d like to type it instead' }).click();
+  await page.getByLabel('Your recall attempt').pressSequentially('1 ');
+  await expect(page.getByLabel('Your recall attempt')).toHaveValue('1 ');
+  await expect(page.getByRole('button', { name: 'Reveal and compare' })).toBeVisible();
 });
 test('simultaneous tabs cannot rate the same scheduled review twice', async ({ page, context }) => {
   await seedDue(page);

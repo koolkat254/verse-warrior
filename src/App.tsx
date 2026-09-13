@@ -15,9 +15,9 @@ export function App() {
   const practicing = location.pathname.startsWith('/practice/') || location.pathname === '/review';
   useEffect(() => {
     window.scrollTo(0, 0);
-    main.current?.focus();
+    if (!practicing) main.current?.focus();
     document.title = 'Verse Warrior';
-  }, [location.pathname]);
+  }, [location.pathname, practicing]);
   return (
     <>
       <a
