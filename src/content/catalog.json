@@ -1,6 +1,132 @@
 {
   "schemaVersion": 1,
-  "contentVersion": "1.0.0",
-  "passages": [],
-  "collections": []
+  "contentVersion": "1.0.1",
+  "passages": [
+    {
+      "id": "matthew-22-36-38-emaw",
+      "reference": "Matthew 22:36-38",
+      "text": "“Teacher, which is the greatest commandment in the Law?” Jesus replied: “‘Love the Lord your God with all your heart and with all your soul and with all your mind.’ This is the first and greatest commandment.”",
+      "translation": "EMAW Verse Pack"
+    },
+    {
+      "id": "2-timothy-3-16-17-emaw",
+      "reference": "2 Timothy 3:16-17",
+      "text": "All Scripture is God-breathed and is useful for teaching, rebuking, correcting and training in righteousness, so that the man of God may be thoroughly equipped for every good work.",
+      "translation": "EMAW Verse Pack"
+    },
+    {
+      "id": "joshua-1-8-emaw",
+      "reference": "Joshua 1:8",
+      "text": "Do not let this Book of the Law depart from your mouth; meditate on it day and night, so that you may be careful to do everything written in it. Then you will be prosperous and successful.",
+      "translation": "EMAW Verse Pack"
+    },
+    {
+      "id": "john-16-24-emaw",
+      "reference": "John 16:24",
+      "text": "Until now you have not asked for anything in my name. Ask and you will receive, and your joy will be complete.",
+      "translation": "EMAW Verse Pack"
+    },
+    {
+      "id": "philippians-4-6-7-emaw",
+      "reference": "Philippians 4:6-7",
+      "text": "Do not be anxious about anything, but in everything, by prayer and petition, with thanksgiving, present your requests to God.\n\nAnd the peace of God, which transcends all understanding, will guard your hearts and your minds in Christ Jesus.",
+      "translation": "EMAW Verse Pack"
+    },
+    {
+      "id": "james-1-22-emaw",
+      "reference": "James 1:22",
+      "text": "Do not merely listen to the word, and so deceive yourselves. Do what it says.",
+      "translation": "EMAW Verse Pack"
+    },
+    {
+      "id": "hebrews-12-11-emaw",
+      "reference": "Hebrews 12:11",
+      "text": "No discipline seems pleasant at the time, but painful. Later on, however, it produces a harvest of righteousness and peace for those who have been trained by it.",
+      "translation": "EMAW Verse Pack"
+    },
+    {
+      "id": "genesis-2-18-emaw",
+      "reference": "Genesis 2:18",
+      "text": "The LORD God said, “It is not good for the man to be alone. I will make a helper suitable for him.”",
+      "translation": "EMAW Verse Pack"
+    },
+    {
+      "id": "ephesians-5-25-emaw",
+      "reference": "Ephesians 5:25",
+      "text": "Husbands, love your wives, just as Christ loved the church and gave himself up for her.",
+      "translation": "EMAW Verse Pack"
+    },
+    {
+      "id": "1-peter-4-19-emaw",
+      "reference": "1 Peter 4:19",
+      "text": "So then, those who suffer according to God’s will should commit themselves to their faithful Creator and continue to do good.",
+      "translation": "EMAW Verse Pack"
+    },
+    {
+      "id": "1-peter-3-7-nasb",
+      "reference": "1 Peter 3:7",
+      "text": "You husbands in the same way, live with your wives in an understanding way, as with someone weaker, since she is a woman; and show her honor as a fellow heir of the grace of life, so that your prayers will not be hindered.",
+      "translation": "NASB"
+    },
+    {
+      "id": "ephesians-6-4-emaw",
+      "reference": "Ephesians 6:4",
+      "text": "Fathers, do not exasperate your children; instead, bring them up in the training and instruction of the Lord.",
+      "translation": "EMAW Verse Pack"
+    },
+    {
+      "id": "proverbs-18-21-emaw",
+      "reference": "Proverbs 18:21",
+      "text": "The tongue has the power of life and death....",
+      "translation": "EMAW Verse Pack"
+    },
+    {
+      "id": "proverbs-18-13-emaw",
+      "reference": "Proverbs 18:13",
+      "text": "He who answers before listening—that is his folly and his shame.",
+      "translation": "EMAW Verse Pack"
+    },
+    {
+      "id": "1-peter-3-8-9-emaw",
+      "reference": "1 Peter 3:8-9",
+      "text": "Finally, all of you, live in harmony with one another; be sympathetic, love as brothers, be compassionate and humble. Do not repay \u0065\u0076\u0069\u006c with \u0065\u0076\u0069\u006c or insult with insult, but with blessing, because to this you were called so that you may inherit a blessing.",
+      "translation": "EMAW Verse Pack"
+    }
+  ],
+  "collections": [
+    {
+      "id": "every-man-a-warrior",
+      "title": "Every Man a Warrior",
+      "description": "Scripture memory passages from the Every Man a Warrior course.",
+      "books": [
+        {
+          "id": "book-1",
+          "title": "Book 1",
+          "passageIds": [
+            "matthew-22-36-38-emaw",
+            "2-timothy-3-16-17-emaw",
+            "joshua-1-8-emaw",
+            "john-16-24-emaw",
+            "philippians-4-6-7-emaw",
+            "james-1-22-emaw",
+            "hebrews-12-11-emaw"
+          ]
+        },
+        {
+          "id": "book-2",
+          "title": "Book 2",
+          "passageIds": [
+            "genesis-2-18-emaw",
+            "ephesians-5-25-emaw",
+            "1-peter-4-19-emaw",
+            "1-peter-3-7-nasb",
+            "ephesians-6-4-emaw",
+            "proverbs-18-21-emaw",
+            "proverbs-18-13-emaw",
+            "1-peter-3-8-9-emaw"
+          ]
+        }
+      ]
+    }
+  ]
 }
