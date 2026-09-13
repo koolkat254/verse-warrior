@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "contentVersion": "test-fixture-1",
+  "passages": [
+    {
+      "id": "practice-one",
+      "reference": "Practice 1:1",
+      "text": "Steady practice builds lasting memory.\nReturn with patience, and begin again.",
+      "translation": "Test wording"
+    },
+    {
+      "id": "practice-two",
+      "reference": "Practice 1:2–3",
+      "text": "Take your time. Let each word find its place.",
+      "translation": "Test wording"
+    },
+    {
+      "id": "practice-variant",
+      "reference": "Practice 1:1",
+      "text": "Patient practice makes a lasting memory.",
+      "translation": "Alternate test wording"
+    }
+  ],
+  "collections": [
+    {
+      "id": "foundations",
+      "title": "Practice foundations",
+      "description": "Synthetic passages for automated testing. Not Scripture or launch content.",
+      "books": [
+        {
+          "id": "book-one",
+          "title": "Book one",
+          "weeks": [
+            {
+              "id": "week-one",
+              "title": "Week one",
+              "passageIds": ["practice-one", "practice-two"]
+            },
+            { "id": "week-two", "title": "Week two", "passageIds": ["practice-variant"] }
+          ]
+        }
+      ]
+    },
+    { "id": "shared", "title": "Shared practice", "passageIds": ["practice-one"] },
+    {
+      "id": "weekly",
+      "title": "Weekly practice",
+      "weeks": [{ "id": "week-one", "title": "Week one", "passageIds": ["practice-two"] }]
+    }
+  ]
+}
