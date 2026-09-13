@@ -82,3 +82,5 @@ Local development commands do not deploy or change repository visibility. Real l
 ## Next version
 
 PWA installation and reliable offline startup are deferred. The next milestone adds a manifest, icons, service-worker caching for app and catalog, and an update prompt that waits until practice ends. Custom collections follow later. Version 1 has no streaks, historical charts, notifications, authentication, or backend services.
+
+
