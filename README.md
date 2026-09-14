@@ -6,7 +6,7 @@ It is a static React, TypeScript, and Vite application for GitHub Pages. There i
 
 ## Current content
 
-The bundled catalog is version `1.0.1` and contains 15 passages in the **Every Man a Warrior** collection, grouped into Book 1 and Book 2. The application is not coupled to that course: the catalog also supports flat collections, weeks, books with weeks, shared passages, and separate translations.
+The bundled catalog is version `1.0.1` and contains 15 passages in the **Every Man a Warrior** collection, organized into two course groups titled Book 1 and Book 2. The application is not coupled to that course: the catalog also supports flat collections, weeks, groups with weeks, shared passages, and separate translations.
 
 Content lives in [src/content/catalog.json](src/content/catalog.json). See [the authoring guide](docs/content-authoring.md) before changing it. Stable passage IDs preserve local learner progress when content is reordered or corrected.
 
@@ -37,6 +37,7 @@ End-to-end tests build a separate `dist-test` from synthetic, non-Scripture fixt
 - **Today** has one main action: it opens due review first, then resumes the newest unfinished passage in the selected learning focus, then offers the next new passage.
 - **Collections** can be activated or paused independently. Pausing removes a collection from the review queue but retains its dates and progress.
 - **Practice** offers reading, progressive word hiding, first-letter hints, typed recall, and standalone reference practice. Extra practice never changes the word-review schedule.
+- **Reference Drill** is available from a collection or group. It offers a randomized choice quiz, a multi-passage matching drill, and typed-reference feedback. These drills are practice only; scheduled reference cards record reference progress.
 - Opening a learning exercise marks a passage as Learning. Selecting **Ready to review** begins an initial recall; submitting that rating schedules tomorrow's review without mastery credit.
 - Scheduled word reviews use 1, 3, 7, 14, 30, and 60-day intervals. Remembered advances one step, Needed help moves back one, and Forgot returns to one day.
 - Word mastery requires three consecutive successful scheduled reviews, including a completed interval of at least seven days. A Needed help or Forgot rating removes mastery; reviews continue afterward.

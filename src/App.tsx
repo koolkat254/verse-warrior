@@ -5,6 +5,7 @@ import { Collections, CollectionDetail } from './pages/Collections';
 import { Today } from './pages/Today';
 import { Practice } from './pages/Practice';
 import { ReviewSession } from './pages/Review';
+import { ReferenceDrill } from './pages/ReferenceDrill';
 import { Settings } from './pages/Settings';
 import { useApp } from './state/context';
 
@@ -77,6 +78,11 @@ export function App() {
           <Route path="/collections" element={<Collections />} />
           <Route path="/collections/:collectionId" element={<CollectionDetail />} />
           <Route path="/practice/:passageId/:mode" element={<Practice />} />
+          <Route path="/reference/:collectionId/:mode" element={<ReferenceDrill />} />
+          <Route
+            path="/reference/:collectionId/groups/:groupId/:mode"
+            element={<ReferenceDrill />}
+          />
           <Route path="/review" element={<ReviewSession />} />
           <Route path="/settings" element={<Settings />} />
           <Route path="*" element={<Recovery />} />

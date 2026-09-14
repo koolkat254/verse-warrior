@@ -20,7 +20,13 @@ import {
   reviewSignature,
   referenceSignature,
 } from '../src/domain/state';
-import { compareWords, firstLetter, normalizeWords, wordOrder } from '../src/domain/text';
+import {
+  compareWords,
+  firstLetter,
+  normalizeReference,
+  normalizeWords,
+  wordOrder,
+} from '../src/domain/text';
 import type { Rating } from '../src/domain/types';
 
 const at = (day: string) => new Date(`${day}T12:00:00`);
@@ -70,7 +76,7 @@ describe('catalog', () => {
     [
       'duplicate group IDs',
       (f: typeof fixture) => {
-        f.collections[0].books![0].weeks[1].id = 'week-one';
+        f.collections[0].groups![0].weeks[1].id = 'week-one';
       },
     ],
   ])('rejects %s', (_name, change) => {
@@ -78,14 +84,14 @@ describe('catalog', () => {
     change(f);
     expect(() => parseCatalog(f)).toThrow();
   });
-  it('supports books without weeks', () => {
+  it('supports groups without weeks', () => {
     const f = {
       ...fixture,
       collections: [
         {
           id: 'direct-book',
-          title: 'Book',
-          books: [{ id: 'one', title: 'One', passageIds: ['practice-one'] }],
+          title: 'Group',
+          groups: [{ id: 'one', title: 'One', passageIds: ['practice-one'] }],
         },
       ],
     };
@@ -273,6 +279,9 @@ describe('progress and queues', () => {
   });
 });
 describe('text comparison and hints', () => {
+  it('normalizes reference punctuation and spacing for typed drills', () => {
+    expect(normalizeReference(' Matthew 22 : 36-38 ')).toBe(normalizeReference('Matthew 22:36–38'));
+  });
   it('normalizes punctuation, Unicode apostrophes and spacing', () =>
     expect(normalizeWords('DON’T  fear—begin, again!')).toEqual([
       'dont',

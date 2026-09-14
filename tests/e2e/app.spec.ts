@@ -131,6 +131,29 @@ test('reference answer stays concealed and narrow layouts do not overflow', asyn
     true,
   );
 });
+test('offers choose, match, and type reference drills for a group', async ({ page }) => {
+  await page.goto('./#/reference/foundations/groups/book-one/choose');
+  await expect(page.getByRole('heading', { name: 'Connect words and references.' })).toBeVisible();
+  await page.getByRole('button').filter({ hasText: 'Practice' }).first().click();
+  await expect(page.getByRole('heading', { name: /That is right|Not this time/ })).toBeVisible();
+  await page.getByRole('link', { name: 'Match' }).click();
+  const selections = page.locator('.match-row select');
+  for (let index = 0; index < (await selections.count()); index++) {
+    const selection = selections.nth(index);
+    await selection.selectOption((await selection.locator('option').nth(1).getAttribute('value'))!);
+    await expect(selection).not.toHaveValue('');
+  }
+  await page.getByRole('button', { name: 'Check matches' }).click();
+  await expect(
+    page.getByRole('heading', { name: /All matched|Check the answers above/ }),
+  ).toBeVisible();
+  await page.getByRole('link', { name: 'Type' }).click();
+  await page.getByLabel('Book, chapter, and verse').fill('Practice 1:1');
+  await page.getByRole('button', { name: 'Check reference' }).click();
+  await expect(
+    page.getByRole('heading', { name: /That is right|Check the reference/ }),
+  ).toBeVisible();
+});
 test('adds a separate reference check without exposing its answer first', async ({ page }) => {
   await seedDue(page);
   await page.evaluate((key) => {

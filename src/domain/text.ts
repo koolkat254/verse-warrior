@@ -7,6 +7,12 @@ export function normalizeWords(text: string): string[] {
     .split(/\s+/u)
     .filter(Boolean);
 }
+export function normalizeReference(reference: string): string {
+  return reference
+    .normalize('NFC')
+    .toLocaleLowerCase('en')
+    .replace(/[^\p{L}\p{N}]/gu, '');
+}
 export interface Difference {
   kind: 'correct' | 'missing' | 'extra' | 'incorrect';
   expected?: string;

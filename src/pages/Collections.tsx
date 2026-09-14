@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { flatten } from '../domain/catalog';
 import { status, STATUS_LABELS } from '../domain/scheduler';
-import type { Book, Collection, Week } from '../domain/types';
+import type { Collection, Group as CollectionGroup, Week } from '../domain/types';
 import { useApp } from '../state/context';
 import { Icon, ProgressCounts, Recovery } from '../components/ui';
 import { dateLabel } from '../domain/dateLabel';
@@ -120,7 +120,7 @@ function Group({
   collectionId,
   top = false,
 }: {
-  group: Collection | Book | Week;
+  group: Collection | CollectionGroup | Week;
   collectionId: string;
   top?: boolean;
 }) {
@@ -133,19 +133,31 @@ function Group({
     <section className={top ? 'collection-content' : 'group-section'}>
       <div className="section-heading">
         <h2>{top ? 'Learning focus' : group.title}</h2>
-        <button
-          className="button small-button"
-          aria-pressed={selected}
-          onClick={() => {
-            void act({
-              type: 'focus',
-              focus: { collectionId, ...(top ? {} : { groupId: group.id }) },
-              now: new Date(),
-            }).catch((e) => setError(e.message));
-          }}
-        >
-          {selected ? 'Current focus' : top ? 'Focus on this collection' : 'Focus here'}
-        </button>
+        <div className="group-actions">
+          <button
+            className="button small-button"
+            aria-pressed={selected}
+            onClick={() => {
+              void act({
+                type: 'focus',
+                focus: { collectionId, ...(top ? {} : { groupId: group.id }) },
+                now: new Date(),
+              }).catch((e) => setError(e.message));
+            }}
+          >
+            {selected ? 'Current focus' : top ? 'Focus on this collection' : 'Focus here'}
+          </button>
+          <Link
+            className="button small-button"
+            to={
+              top
+                ? `/reference/${collectionId}/choose`
+                : `/reference/${collectionId}/groups/${group.id}/choose`
+            }
+          >
+            Reference drill
+          </Link>
+        </div>
       </div>
       {error && <p role="alert">{error}</p>}
       {!top && <ProgressCounts ids={flatten(group)} />}
@@ -154,8 +166,8 @@ function Group({
       ) : group.weeks ? (
         group.weeks.map((week) => <Group key={week.id} group={week} collectionId={collectionId} />)
       ) : (
-        ('books' in group ? (group.books ?? []) : []).map((book) => (
-          <Group key={book.id} group={book} collectionId={collectionId} />
+        ('groups' in group ? (group.groups ?? []) : []).map((section) => (
+          <Group key={section.id} group={section} collectionId={collectionId} />
         ))
       )}
     </section>

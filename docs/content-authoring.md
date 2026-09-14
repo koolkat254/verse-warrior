@@ -36,7 +36,7 @@ This is a **format example**, not Scripture or recommended launch content:
 
 ## Organization
 
-A collection has exactly one of `passageIds`, `weeks`, or `books`. A book has exactly one of `passageIds` or `weeks`. A week always has `passageIds`. Each group has an `id` and `title`. Arrays determine display and learning order.
+A collection has exactly one of `passageIds`, `weeks`, or `groups`. A group has exactly one of `passageIds` or `weeks`. A week always has `passageIds`. Each group has an `id` and `title`; the title can use course-specific language such as “Book 1” or “Section A.” Arrays determine display and learning order.
 
 For a weeks-only collection, replace `passageIds` with:
 
@@ -46,10 +46,10 @@ For a weeks-only collection, replace `passageIds` with:
 ]
 ```
 
-For a course with books and weeks, use:
+For a course with groups and weeks, use:
 
 ```json
-"books": [
+"groups": [
   {
     "id": "book-1",
     "title": "Book 1",
@@ -65,7 +65,7 @@ Groups may be empty while preparing content. Multi-verse selections remain one i
 ## Stable IDs protect progress
 
 - IDs use lowercase ASCII letters, numbers, hyphens, and underscores; begin with a letter or number. Reserved object-property names are rejected.
-- Passage and collection IDs are unique across the catalog. Group IDs are unique within their collection, including across books.
+- Passage and collection IDs are unique across the catalog, including group and week IDs within a collection.
 - Every `passageIds` entry references a defined passage. Duplicate IDs within a single passage list are rejected.
 - Reuse a passage ID across groups or collections when the memorization item is shared. Queues and totals deduplicate it.
 - Different translations, excerpts, or substantial wording changes need a **new passage ID**. Never recycle an ID for unrelated material.

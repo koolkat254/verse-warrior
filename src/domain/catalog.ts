@@ -1,4 +1,4 @@
-import type { Book, Catalog, Collection, Passage, Week } from './types';
+import type { Catalog, Collection, Group, Passage, Week } from './types';
 
 export function record(value: unknown, label: string): Record<string, unknown> {
   if (!value || typeof value !== 'object' || Array.isArray(value))
@@ -48,9 +48,9 @@ export function parseCatalog(input: unknown): Catalog {
     return ids;
   };
   function shape(o: Record<string, unknown>, allowed: string[]) {
-    const present = ['passageIds', 'weeks', 'books'].filter((k) => o[k] !== undefined);
+    const present = ['passageIds', 'weeks', 'groups'].filter((k) => o[k] !== undefined);
     if (present.length !== 1 || !allowed.includes(present[0]))
-      throw new Error('Choose exactly one supported grouping: passageIds, weeks, or books.');
+      throw new Error('Choose exactly one supported grouping: passageIds, weeks, or groups.');
   }
   const collections: Collection[] = array(root.collections, 'Collections').map((value) => {
     const c = record(value, 'Collection');
@@ -66,22 +66,22 @@ export function parseCatalog(input: unknown): Catalog {
       shape(g, ['passageIds']);
       return { id, title, passageIds: passageIds(g.passageIds) };
     }
-    function book(value: unknown): Book {
+    function groupSection(value: unknown): Group {
       const { g, id, title } = group(value);
       shape(g, ['passageIds', 'weeks']);
       return g.weeks === undefined
         ? { id, title, passageIds: passageIds(g.passageIds) }
         : { id, title, weeks: array(g.weeks, 'Weeks').map(week) };
     }
-    shape(c, ['passageIds', 'weeks', 'books']);
+    shape(c, ['passageIds', 'weeks', 'groups']);
     const base = {
       id: identifier(c.id, 'Collection ID'),
       title: text(c.title, 'Collection title'),
       ...(c.description === undefined ? {} : { description: text(c.description, 'Description') }),
     };
     const result =
-      c.books !== undefined
-        ? { ...base, books: array(c.books, 'Books').map(book) }
+      c.groups !== undefined
+        ? { ...base, groups: array(c.groups, 'Groups').map(groupSection) }
         : c.weeks !== undefined
           ? { ...base, weeks: array(c.weeks, 'Weeks').map(week) }
           : { ...base, passageIds: passageIds(c.passageIds) };
@@ -99,19 +99,19 @@ export function parseCatalog(input: unknown): Catalog {
     collections,
   };
 }
-export function flatten(group: Collection | Book | Week): string[] {
+export function flatten(group: Collection | Group | Week): string[] {
   if (group.passageIds) return [...new Set(group.passageIds)];
   if (group.weeks) return [...new Set(group.weeks.flatMap(flatten))];
-  return [...new Set(('books' in group ? (group.books ?? []) : []).flatMap(flatten))];
+  return [...new Set(('groups' in group ? (group.groups ?? []) : []).flatMap(flatten))];
 }
 export function findGroup(
   collection: Collection,
   id?: string,
-): Collection | Book | Week | undefined {
+): Collection | Group | Week | undefined {
   if (!id) return collection;
-  for (const book of collection.books ?? []) {
-    if (book.id === id) return book;
-    const week = book.weeks?.find((w) => w.id === id);
+  for (const group of collection.groups ?? []) {
+    if (group.id === id) return group;
+    const week = group.weeks?.find((w) => w.id === id);
     if (week) return week;
   }
   return collection.weeks?.find((w) => w.id === id);

@@ -10,13 +10,13 @@ export interface Week {
   title: string;
   passageIds: string[];
 }
-export type Book = { id: string; title: string } & (
+export type Group = { id: string; title: string } & (
   { passageIds: string[]; weeks?: never } | { weeks: Week[]; passageIds?: never }
 );
 export type Collection = { id: string; title: string; description?: string } & (
-  | { passageIds: string[]; weeks?: never; books?: never }
-  | { weeks: Week[]; passageIds?: never; books?: never }
-  | { books: Book[]; passageIds?: never; weeks?: never }
+  | { passageIds: string[]; weeks?: never; groups?: never }
+  | { weeks: Week[]; passageIds?: never; groups?: never }
+  | { groups: Group[]; passageIds?: never; weeks?: never }
 );
 export interface Catalog {
   schemaVersion: 1;

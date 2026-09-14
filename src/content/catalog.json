@@ -63,10 +63,10 @@
       "translation": "EMAW Verse Pack"
     },
     {
-      "id": "1-peter-3-7-nasb",
+      "id": "1-peter-3-7-emaw",
       "reference": "1 Peter 3:7",
       "text": "You husbands in the same way, live with your wives in an understanding way, as with someone weaker, since she is a woman; and show her honor as a fellow heir of the grace of life, so that your prayers will not be hindered.",
-      "translation": "NASB"
+      "translation": "EMAW Verse Pack"
     },
     {
       "id": "ephesians-6-4-emaw",
@@ -98,7 +98,7 @@
       "id": "every-man-a-warrior",
       "title": "Every Man a Warrior",
       "description": "Scripture memory passages from the Every Man a Warrior course.",
-      "books": [
+      "groups": [
         {
           "id": "book-1",
           "title": "Book 1",
@@ -119,7 +119,7 @@
             "genesis-2-18-emaw",
             "ephesians-5-25-emaw",
             "1-peter-4-19-emaw",
-            "1-peter-3-7-nasb",
+            "1-peter-3-7-emaw",
             "ephesians-6-4-emaw",
             "proverbs-18-21-emaw",
             "proverbs-18-13-emaw",
