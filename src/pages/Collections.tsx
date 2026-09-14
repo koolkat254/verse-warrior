@@ -132,7 +132,7 @@ function Group({
   return (
     <section className={top ? 'collection-content' : 'group-section'}>
       <div className="section-heading">
-        <h2>{top ? 'Learning focus' : group.title}</h2>
+        <h2>{top ? 'Where to learn next' : group.title}</h2>
         <div className="group-actions">
           <button
             className="button small-button"
@@ -145,7 +145,11 @@ function Group({
               }).catch((e) => setError(e.message));
             }}
           >
-            {selected ? 'Current focus' : top ? 'Focus on this collection' : 'Focus here'}
+            {selected
+              ? 'Learning from here'
+              : top
+                ? 'Learn from this collection'
+                : 'Learn from this group'}
           </button>
           <Link
             className="button small-button"
@@ -159,6 +163,9 @@ function Group({
           </Link>
         </div>
       </div>
+      {top && (
+        <p className="learning-direction">Today suggests new passages from this selection.</p>
+      )}
       {error && <p role="alert">{error}</p>}
       {!top && <ProgressCounts ids={flatten(group)} />}
       {group.passageIds ? (

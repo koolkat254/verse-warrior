@@ -3,6 +3,13 @@ import { counts, STATUS_LABELS } from '../domain/scheduler';
 import { useApp } from '../state/context';
 import type { Passage } from '../domain/types';
 
+const STATUS_DESCRIPTIONS = {
+  new: 'You have not opened this passage yet.',
+  learning: 'You have practiced it, but have not started scheduled review.',
+  reviewing: 'It is in your spaced-review rhythm.',
+  mastered: 'You have recalled it successfully over time. Reviews continue.',
+} as const;
+
 export function Icon({
   name,
   size = 22,
@@ -79,33 +86,16 @@ export function ProgressCounts({ ids }: { ids: string[] }) {
       <progress value={summary.mastered} max={total || 1} aria-label="Passages mastered" />
       <div className="count-grid">
         {Object.entries(summary).map(([key, value]) => (
-          <div key={key}>
+          <div
+            key={key}
+            title={STATUS_DESCRIPTIONS[key as keyof typeof STATUS_DESCRIPTIONS]}
+            aria-label={`${value} ${STATUS_LABELS[key as keyof typeof STATUS_LABELS]}. ${STATUS_DESCRIPTIONS[key as keyof typeof STATUS_DESCRIPTIONS]}`}
+          >
             <strong>{value}</strong>
             <span>{STATUS_LABELS[key as keyof typeof STATUS_LABELS]}</span>
           </div>
         ))}
       </div>
-      <details className="progress-definitions">
-        <summary>What do these mean?</summary>
-        <dl>
-          <div>
-            <dt>Not started</dt>
-            <dd>You have not opened this passage yet.</dd>
-          </div>
-          <div>
-            <dt>Learning</dt>
-            <dd>You have practiced it, but have not started scheduled review.</dd>
-          </div>
-          <div>
-            <dt>Reviewing</dt>
-            <dd>It is in your spaced-review rhythm.</dd>
-          </div>
-          <div>
-            <dt>Mastered</dt>
-            <dd>You have recalled it successfully over time. Reviews continue.</dd>
-          </div>
-        </dl>
-      </details>
     </div>
   );
 }

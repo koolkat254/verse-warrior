@@ -455,34 +455,8 @@ progress::-moz-progress-bar {
   color: var(--muted);
   font-size: 0.65rem;
 }
-.progress-definitions {
-  border-top: 1px solid var(--line);
-  margin-top: 18px;
-  padding-top: 8px;
-}
-.progress-definitions summary {
-  align-items: center;
-  color: var(--green);
-  cursor: pointer;
-  display: flex;
-  font-size: 0.76rem;
-  font-weight: 600;
-  min-height: 44px;
-}
-.progress-definitions dl {
-  margin: 0;
-}
-.progress-definitions dl > div {
-  align-items: baseline;
-  font-size: 0.76rem;
-}
-.progress-definitions dt {
-  color: var(--ink);
-  font-weight: 600;
-}
-.progress-definitions dd {
-  color: var(--muted);
-  max-width: 70%;
+.count-grid > div[title] {
+  cursor: help;
 }
 .empty {
   text-align: center;
@@ -1338,6 +1312,11 @@ dd {
   .restore-preview {
     padding: 18px;
   }
+}
+.learning-direction {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: -6px 0 18px;
 }
 @media (prefers-reduced-motion: reduce) {
   *,

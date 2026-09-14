@@ -100,8 +100,8 @@ export function Today() {
           </section>
           <p className="focus-line">
             {focusCollection
-              ? `Learning focus: ${focusCollection.title}${group && group !== focusCollection ? ` · ${group.title}` : ''}.`
-              : 'Choose a collection, book, or week as your learning focus.'}{' '}
+              ? `Learning next from: ${focusCollection.title}${group && group !== focusCollection ? ` · ${group.title}` : ''}.`
+              : 'Choose a collection, group, or week for your next passage.'}{' '}
             <Link to={focusCollection ? `/collections/${focusCollection.id}` : '/collections'}>
               Change
             </Link>

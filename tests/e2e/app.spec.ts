@@ -49,7 +49,7 @@ test('choose a collection, learn, enroll, refresh, and navigate with Back', asyn
   const card = page.getByRole('article').filter({ hasText: 'Practice foundations' });
   await card.getByRole('button', { name: 'Activate collection' }).click();
   await card.getByRole('link', { name: 'Practice foundations' }).click();
-  await page.getByRole('button', { name: 'Focus on this collection' }).click();
+  await page.getByRole('button', { name: 'Learn from this collection' }).click();
   await page.getByRole('link', { name: /Practice 1:1 Test wording/ }).click();
   await expect(
     page.getByText('Steady practice builds lasting memory.', { exact: false }),
