@@ -2,7 +2,7 @@
 
 The production content source is `src/content/catalog.json`, imported at build time. Edit it, run `npm run validate:content`, then run full checks before publishing.
 
-The initial file is empty by agreement. Supply your exact wording, references, translation labels, and applicable attribution. Do not copy test fixtures into production.
+The bundled catalog already contains the launch collection. Supply exact wording, references, translation labels, and applicable attribution for any additions or corrections. Do not copy test fixtures into production.
 
 ## Minimal shape
 

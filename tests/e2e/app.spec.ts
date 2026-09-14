@@ -14,6 +14,7 @@ async function seedDue(page: Page) {
     const p = {
       startedAt: '2026-01-01T18:00:00.000Z',
       lastPracticedAt: '2026-01-05T18:00:00.000Z',
+      reference: null,
       review: {
         intervalStep: 2,
         dueDate: '2026-01-12',
@@ -129,6 +130,28 @@ test('reference answer stays concealed and narrow layouts do not overflow', asyn
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
     true,
   );
+});
+test('adds a separate reference check without exposing its answer first', async ({ page }) => {
+  await seedDue(page);
+  await page.evaluate((key) => {
+    const state = JSON.parse(localStorage.getItem(key)!);
+    state.passageProgress['practice-two'].review.dueDate = '2026-02-01';
+    localStorage.setItem(key, JSON.stringify(state));
+  }, storageKey);
+  await page.reload();
+  await page.getByRole('link', { name: 'Start practice' }).click();
+  await page.getByRole('button', { name: 'Reveal passage' }).click();
+  await page.getByRole('button', { name: /^Remembered/ }).click();
+  await page.getByRole('button', { name: 'Next passage' }).click();
+  await expect(page.getByRole('heading', { name: 'Where are these words found?' })).toBeVisible();
+  await expect(page.locator('main')).not.toContainText('Practice 1:2');
+  await page.getByRole('button', { name: 'Reveal reference' }).click();
+  await expect(page.getByRole('heading', { name: /Practice 1:2/ })).toBeVisible();
+  await page.getByRole('button', { name: /^Remembered/ }).click();
+  await expect(page.getByText('1 of 3 consecutive reference recalls.')).toBeVisible();
+  expect(
+    (await stored(page)).passageProgress['practice-two'].reference.successfulRecallStreak,
+  ).toBe(1);
 });
 test('keyboard shortcuts reveal, rate, and advance a review without affecting typed attempts', async ({
   page,

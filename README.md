@@ -1,85 +1,79 @@
 # Verse Warrior
 
-A quiet, mobile-first Bible memorization app. Learn passages with full-text study, progressive word hiding, first-letter hints, typed recall, and reference practice. Return for self-rated spaced reviews that build lasting memory.
+Verse Warrior is a quiet, mobile-first Bible memorization app. It helps a learner study a passage, remove help gradually, recall its words and reference, and return for spaced review.
 
-React · TypeScript · Vite · GitHub Pages. No backend, accounts, or Bible API.
+It is a static React, TypeScript, and Vite application for GitHub Pages. There is no backend, account system, Bible API, or automatic cross-device sync.
+
+## Current content
+
+The bundled catalog is version `1.0.1` and contains 15 passages in the **Every Man a Warrior** collection, grouped into Book 1 and Book 2. The application is not coupled to that course: the catalog also supports flat collections, weeks, books with weeks, shared passages, and separate translations.
+
+Content lives in [src/content/catalog.json](src/content/catalog.json). See [the authoring guide](docs/content-authoring.md) before changing it. Stable passage IDs preserve local learner progress when content is reordered or corrected.
 
 ## Development
 
-Use **Node 24 LTS** and npm. `.nvmrc` records the Node major; `package-lock.json` locks dependencies.
+Use Node 24 LTS and npm. The supported Node range is recorded in `package.json`; `package-lock.json` locks dependencies.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Open the URL printed by Vite, including `/verse-warrior/`. The production catalog is intentionally empty until the maintainer supplies launch content. No test wording or third-party Scripture is bundled by default.
-
-In the current Windows workspace, a portable Node runtime is available in the ignored `.tools/node-v24.21.0-win-x64` directory. If Node is not on PATH, enable it for the current PowerShell session:
-
-```powershell
-$env:PATH = "$PWD\.tools\node-v24.21.0-win-x64;$env:PATH"
-npm.cmd run dev
-```
+Vite serves the app under `/verse-warrior/`. Open the local URL it prints, including that path.
 
 ## Checks
 
 ```sh
-npm run check                 # Lint, tests, content validation, typecheck, build
+npm run check                 # lint, unit/component tests, content validation, typecheck, build
 npx playwright install chromium webkit
-npm run test:e2e              # Chromium desktop and WebKit mobile workflows
-npm run preview              # Serve the normal production build
+npm run test:e2e              # Chromium desktop and mobile WebKit workflows
+npm run preview               # serve the production build
 ```
 
-End-to-end tests build a separate `dist-test` using synthetic, non-Scripture fixtures and start a server on port 4173. Production builds exclude fixtures. To inspect the fixture experience manually, run `npm run build:e2e`, then `npm run preview:e2e`.
+End-to-end tests build a separate `dist-test` from synthetic, non-Scripture fixtures and serve it on port 4173. Production builds do not include those fixtures. To inspect that test build manually, run `npm run build:e2e`, then `npm run preview:e2e`.
 
-On the current Windows workspace, if browsers were installed locally, set `$env:PLAYWRIGHT_BROWSERS_PATH = "$PWD\.tools\playwright"` before end-to-end commands.
+## How it works
 
-## Content
+- **Today** has one main action: it opens due review first, then resumes the newest unfinished passage in the selected learning focus, then offers the next new passage.
+- **Collections** can be activated or paused independently. Pausing removes a collection from the review queue but retains its dates and progress.
+- **Practice** offers reading, progressive word hiding, first-letter hints, typed recall, and standalone reference practice. Extra practice never changes the word-review schedule.
+- Opening a learning exercise marks a passage as Learning. Selecting **Ready to review** begins an initial recall; submitting that rating schedules tomorrow's review without mastery credit.
+- Scheduled word reviews use 1, 3, 7, 14, 30, and 60-day intervals. Remembered advances one step, Needed help moves back one, and Forgot returns to one day.
+- Word mastery requires three consecutive successful scheduled reviews, including a completed interval of at least seven days. A Needed help or Forgot rating removes mastery; reviews continue afterward.
+- A review session contains up to five word-recall cards, followed by up to two reference cards for passages whose words were not shown in that session. Reference recall has its own three-success **solid** signal and does not affect word mastery or scheduling.
+- On a physical keyboard, Space or Enter reveals an answer and advances after a rating. Word cards use `1`, `2`, and `3` for Remembered, Needed help, and Forgot. Reference cards use `1` and `2`. Shortcuts do not apply while the learner is typing.
 
-Edit `src/content/catalog.json`. See [the content authoring guide](docs/content-authoring.md) for the schema, examples, ID rules, and validation. The maintainer supplies exact references, text, translation labels, and applicable attribution. Different translations may coexist as separate passage IDs.
+## Progress, backup, and privacy
 
-## Product behavior
+Progress is stored only in this browser under the versioned `verse-warrior:state` localStorage key. It includes active collections, learning focus, word-review records, and reference-recall records. Scripture text, typed attempts, hint patterns, and complete review history are not stored there.
 
-- Today has one **Start practice** action. It resumes due reviews first; otherwise it resumes the latest unfinished passage in the selected learning focus, then starts the next new passage.
-- Collections can be flat, organized into weeks, or organized into books with optional weeks. Nothing is locked to a calendar or course brand.
-- Practice tools are optional and never automatically award mastery.
-- “Ready to review” requires an initial recall rating and schedules tomorrow. Subsequent reviews use 1, 3, 7, 14, 30, and 60-day intervals.
-- Remembered advances one interval; Needed help moves back one; Forgot resets to one day.
-- Mastery requires three consecutive successful scheduled reviews, including an interval of at least seven days. Either unsuccessful rating removes mastery. Reviews continue after mastery.
-- Pausing preserves dates. Identical passage IDs share progress across collections.
-- Review sessions present up to five passages at a time. On a physical keyboard, Space or Enter reveals and advances; `1`, `2`, and `3` select Remembered, Needed help, and Forgot. Shortcuts never apply while typing.
+Due dates use local calendar dates. Recorded actions use UTC timestamps. Browser focus, visibility changes, cross-tab storage changes, and midnight refresh the displayed schedule.
 
-## Progress and recovery
+Settings can export a JSON backup and restore a validated backup after confirmation. Restoring replaces the current Verse Warrior state. Unknown passage IDs are retained as dormant data, so a later catalog can make them available again. If storage is unavailable or data is malformed, the session remains usable and Settings offers recovery or export options.
 
-The versioned `verse-warrior:state` localStorage document contains active collection IDs, learning focus, and progress keyed by passage ID. Scripture, typed drafts, hints, and review history are not copied into storage. Dates are local calendar dates; event timestamps are UTC.
-
-Settings exports progress as JSON. Restore validates and previews the complete backup, then replaces current progress only after confirmation. Unknown passage IDs remain dormant. Invalid stored data is protected and can be downloaded verbatim before recovery; write failures keep the session usable with a visible warning.
-
-Browser progress normally survives restarts, but clearing site data or ending a private browsing session can remove it. There is no automatic device sync. Modern browsers use Web Locks to serialize writes across tabs, with review signatures to reject stale submissions. Browsers without Web Locks detect already-persisted changes but cannot guarantee atomic simultaneous writes; current Chromium and WebKit are tested targets.
+Browser progress normally survives restarts, but clearing site data or ending a private-browsing session can remove it. Use backups before changing browsers or devices. Modern browsers use Web Locks and per-record signatures to prevent stale ratings across tabs.
 
 ## Deployment
 
-`.github/workflows/ci.yml` checks pull requests and main-branch pushes. Successful main builds publish `dist` through GitHub Pages. Vite uses `/verse-warrior/` as its base; HashRouter supports bookmarked routes on static hosting.
+The [GitHub Actions workflow](.github/workflows/ci.yml) runs checks and browser tests on pull requests and `main`. Successful `main` builds deploy `dist` to GitHub Pages. Vite uses `/verse-warrior/` as its base and HashRouter keeps bookmarked routes compatible with static hosting.
 
-Before the first public release:
+Before a release:
 
-1. Supply and verify the launch catalog, including text and attribution.
-2. Confirm the repository is public if using GitHub Free. Do not change visibility implicitly.
-3. Set **Settings → Pages → Build and deployment → Source** to **GitHub Actions**.
-4. Push to `main` and confirm checks and deployment pass.
-5. Open `https://koolkat254.github.io/verse-warrior/`; test a bookmarked passage URL, reload, review persistence, and backup restore.
-6. Test on a real mobile browser. Automated WebKit emulation does not replace a physical-device check.
+1. Verify the catalog's wording, translation labels, attribution, ordering, and passage IDs.
+2. Confirm the repository is public if using GitHub Free hosting.
+3. In GitHub, set **Settings > Pages > Build and deployment > Source** to **GitHub Actions**.
+4. Push `main`, confirm the workflow succeeds, and open `https://koolkat254.github.io/verse-warrior/`.
+5. Smoke-test a bookmarked hash route, local progress after reload, a review rating, and backup restore.
+6. Test on a real mobile browser. Automated WebKit coverage does not replace a device check.
 
-Local development commands do not deploy or change repository visibility. Real launch content, hosted smoke testing, and a physical-device check remain release requirements.
+## Project structure
 
-## Structure
-
-- `src/domain`: validation, types, dates, scheduling, state transitions, word comparison.
-- `src/state`: persistent store and React context; exercise drafts stay in component memory.
-- `src/components`, `src/pages`: responsive UI, learning, review, and backup controls.
-- `tests`: domain/storage tests, interaction tests, fixtures, browser workflows.
+- `src/content`: bundled catalog.
+- `src/domain`: content validation, scheduling, state transitions, dates, and text comparison.
+- `src/state`: localStorage adapter and React state context.
+- `src/components` and `src/pages`: responsive application UI and exercises.
+- `tests`: domain, storage, interaction, and Playwright browser coverage.
 
 ## Next version
 
-PWA installation and reliable offline startup are deferred. The next milestone adds a manifest, icons, service-worker caching for app and catalog, and an update prompt that waits until practice ends. Custom collections follow later. Version 1 has no streaks, historical charts, notifications, authentication, or backend services.
+PWA installation and reliable offline startup are next. That work will add a manifest, installation assets, service-worker caching for the application and catalog, and an update prompt that waits for practice to finish. Custom collection creation/import follows later.

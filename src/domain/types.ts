@@ -25,6 +25,7 @@ export interface Catalog {
   collections: Collection[];
 }
 export type Rating = 'remembered' | 'help' | 'forgot';
+export type ReferenceRating = 'remembered' | 'help';
 export interface Review {
   intervalStep: number;
   dueDate: string;
@@ -33,10 +34,17 @@ export interface Review {
   successfulReviewStreak: number;
   masteredAt: string | null;
 }
+export interface ReferenceRecall {
+  lastReviewedAt: string;
+  lastRating: ReferenceRating;
+  successfulRecallStreak: number;
+  solidAt: string | null;
+}
 export interface PassageProgress {
   startedAt: string;
   lastPracticedAt: string;
   review: Review | null;
+  reference: ReferenceRecall | null;
 }
 export interface LearningFocus {
   collectionId: string;

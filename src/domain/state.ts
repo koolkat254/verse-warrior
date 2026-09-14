@@ -1,11 +1,13 @@
 import { array, identifier, record, text, unique } from './catalog';
-import { rateReview } from './scheduler';
+import { rateReference, rateReview } from './scheduler';
 import type {
   Backup,
   LearningFocus,
   PassageProgress,
   ProgressState,
   Rating,
+  ReferenceRating,
+  ReferenceRecall,
   Review,
 } from './types';
 
@@ -87,10 +89,30 @@ export function parseState(input: unknown): ProgressState {
       if (review.lastRating !== 'remembered' && review.successfulReviewStreak !== 0)
         throw new Error('Unsuccessful reviews must reset the success streak.');
     }
+    let reference: ReferenceRecall | null = null;
+    if (p.reference !== undefined && p.reference !== null) {
+      const r = record(p.reference, 'Reference recall');
+      if (!['remembered', 'help'].includes(String(r.lastRating)))
+        throw new Error('Invalid reference rating.');
+      reference = {
+        lastReviewedAt: timestamp(r.lastReviewedAt, 'Last reference recall'),
+        lastRating: r.lastRating as ReferenceRating,
+        successfulRecallStreak: integer(r.successfulRecallStreak, 'reference success streak'),
+        solidAt: r.solidAt === null ? null : timestamp(r.solidAt, 'Reference solid date'),
+      };
+      if (
+        reference.solidAt &&
+        (reference.successfulRecallStreak < 3 || reference.lastRating !== 'remembered')
+      )
+        throw new Error('Reference recall evidence is inconsistent.');
+      if (reference.lastRating !== 'remembered' && reference.successfulRecallStreak !== 0)
+        throw new Error('Unsuccessful reference recalls must reset the success streak.');
+    }
     passageProgress[id] = {
       startedAt: timestamp(p.startedAt, 'Started date'),
       lastPracticedAt: timestamp(p.lastPracticedAt, 'Last practiced'),
       review,
+      reference,
     };
   }
   return {
@@ -115,10 +137,14 @@ export type Action =
   | { type: 'activate'; id: string; active: boolean; now: Date }
   | { type: 'focus'; focus: LearningFocus; now: Date }
   | { type: 'practice'; id: string; now: Date }
-  | { type: 'rate'; id: string; rating: Rating; expected: string; now: Date };
+  | { type: 'rate'; id: string; rating: Rating; expected: string; now: Date }
+  | { type: 'rate-reference'; id: string; rating: ReferenceRating; expected: string; now: Date };
 
 export function reviewSignature(review?: Review | null): string {
   return JSON.stringify(review ?? null);
+}
+export function referenceSignature(reference?: ReferenceRecall | null): string {
+  return JSON.stringify(reference ?? null);
 }
 export function progressReducer(state: ProgressState, action: Action): ProgressState {
   const stamp = action.now.toISOString();
@@ -136,6 +162,13 @@ export function progressReducer(state: ProgressState, action: Action): ProgressS
     throw new Error(
       'This passage changed in another tab. Your rating was not applied. Return to Today to refresh your review session.',
     );
+  if (
+    action.type === 'rate-reference' &&
+    referenceSignature(previous?.reference) !== action.expected
+  )
+    throw new Error(
+      'This reference changed in another tab. Your rating was not applied. Return to Today to refresh your review session.',
+    );
   const progress: PassageProgress = {
     startedAt: previous?.startedAt ?? stamp,
     lastPracticedAt: stamp,
@@ -143,6 +176,10 @@ export function progressReducer(state: ProgressState, action: Action): ProgressS
       action.type === 'rate'
         ? rateReview(previous?.review ?? null, action.rating, action.now)
         : (previous?.review ?? null),
+    reference:
+      action.type === 'rate-reference'
+        ? rateReference(previous?.reference ?? null, action.rating, action.now)
+        : (previous?.reference ?? null),
   };
   return {
     ...state,

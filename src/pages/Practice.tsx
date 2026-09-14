@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { WordHints, Typing } from '../components/Exercises';
 import { Recall } from '../components/Recall';
@@ -25,7 +25,10 @@ function PracticeContent({ passage, mode }: { passage: Passage; mode: string }) 
   const [referenceVisible, setReferenceVisible] = useState(false),
     [error, setError] = useState('');
   const [expected] = useState(() => reviewSignature(state.passageProgress[passage.id]?.review));
+  const recordedPassageId = useRef<string | null>(null);
   useEffect(() => {
+    if (recordedPassageId.current === passage.id) return;
+    recordedPassageId.current = passage.id;
     void act({ type: 'practice', id: passage.id, now: new Date() }).catch((e) =>
       setError(e.message),
     );

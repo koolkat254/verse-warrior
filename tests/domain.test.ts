@@ -7,7 +7,9 @@ import {
   counts,
   duePassageIds,
   localDay,
+  rateReference,
   rateReview,
+  referencePassageIds,
   status,
 } from '../src/domain/scheduler';
 import {
@@ -16,6 +18,7 @@ import {
   parseState,
   progressReducer,
   reviewSignature,
+  referenceSignature,
 } from '../src/domain/state';
 import { compareWords, firstLetter, normalizeWords, wordOrder } from '../src/domain/text';
 import type { Rating } from '../src/domain/types';
@@ -142,6 +145,15 @@ describe('review scheduling', () => {
     expect(addDays('2026-10-31', 1)).toBe('2026-11-01');
     expect(localDay(at('2026-01-01'))).toBe('2026-01-01');
   });
+  it('builds and resets a separate reference recall signal', () => {
+    let reference = rateReference(null, 'remembered', at('2026-01-01'));
+    reference = rateReference(reference, 'remembered', at('2026-01-02'));
+    expect(reference.solidAt).toBeNull();
+    reference = rateReference(reference, 'remembered', at('2026-01-03'));
+    expect(reference.solidAt).toBe(at('2026-01-03').toISOString());
+    reference = rateReference(reference, 'help', at('2026-01-04'));
+    expect(reference).toMatchObject({ successfulRecallStreak: 0, solidAt: null });
+  });
 });
 describe('progress and queues', () => {
   it('deduplicates shared passages and retains due dates across activation', () => {
@@ -209,6 +221,32 @@ describe('progress and queues', () => {
         now: at('2026-01-02'),
       }),
     ).toThrow('another tab');
+  });
+  it('selects reference cards that were not shown in word recall', () => {
+    let state = { ...emptyState(), activeCollectionIds: ['foundations'] };
+    state = progressReducer(state, {
+      type: 'rate',
+      id: 'practice-one',
+      rating: 'remembered',
+      expected: 'null',
+      now: at('2026-01-01'),
+    });
+    state = progressReducer(state, {
+      type: 'rate',
+      id: 'practice-two',
+      rating: 'remembered',
+      expected: 'null',
+      now: at('2026-01-01'),
+    });
+    expect(referencePassageIds(catalog, state, ['practice-one'])).toEqual(['practice-two']);
+    state = progressReducer(state, {
+      type: 'rate-reference',
+      id: 'practice-two',
+      rating: 'remembered',
+      expected: referenceSignature(null),
+      now: at('2026-01-02'),
+    });
+    expect(state.passageProgress['practice-two'].reference?.successfulRecallStreak).toBe(1);
   });
   it('validates versioned backup state and preserves dormant passage IDs', () => {
     const state = progressReducer(emptyState(), {

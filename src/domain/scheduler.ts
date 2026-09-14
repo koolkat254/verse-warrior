@@ -1,5 +1,13 @@
 import { flatten } from './catalog';
-import type { Catalog, PassageProgress, ProgressState, Rating, Review } from './types';
+import type {
+  Catalog,
+  PassageProgress,
+  ProgressState,
+  Rating,
+  ReferenceRating,
+  ReferenceRecall,
+  Review,
+} from './types';
 
 export const INTERVALS = [1, 3, 7, 14, 30, 60] as const;
 export function localDay(date: Date): string {
@@ -45,6 +53,21 @@ export function rateReview(previous: Review | null, rating: Rating, now: Date): 
     masteredAt: remembered ? (previous.masteredAt ?? (qualifies ? timestamp : null)) : null,
   };
 }
+export function rateReference(
+  previous: ReferenceRecall | null,
+  rating: ReferenceRating,
+  now: Date,
+): ReferenceRecall {
+  const timestamp = now.toISOString();
+  const streak = rating === 'remembered' ? (previous?.successfulRecallStreak ?? 0) + 1 : 0;
+  return {
+    lastReviewedAt: timestamp,
+    lastRating: rating,
+    successfulRecallStreak: streak,
+    solidAt:
+      rating === 'remembered' ? (previous?.solidAt ?? (streak >= 3 ? timestamp : null)) : null,
+  };
+}
 export function activePassageIds(catalog: Catalog, state: ProgressState): string[] {
   return [
     ...new Set(
@@ -67,6 +90,24 @@ export function duePassageIds(catalog: Catalog, state: ProgressState, now: Date)
           state.passageProgress[b].review!.dueDate,
         ) || a.localeCompare(b),
     );
+}
+export function referencePassageIds(
+  catalog: Catalog,
+  state: ProgressState,
+  excludedIds: readonly string[] = [],
+): string[] {
+  const excluded = new Set(excludedIds);
+  return activePassageIds(catalog, state)
+    .filter((id) => state.passageProgress[id]?.review && !excluded.has(id))
+    .sort((a, b) => {
+      const first = state.passageProgress[a].reference;
+      const second = state.passageProgress[b].reference;
+      return (
+        Number(Boolean(first?.solidAt)) - Number(Boolean(second?.solidAt)) ||
+        (first?.lastReviewedAt ?? '').localeCompare(second?.lastReviewedAt ?? '') ||
+        a.localeCompare(b)
+      );
+    });
 }
 export const STATUS_LABELS = {
   new: 'Not started',

@@ -93,6 +93,14 @@ function PassageList({ ids }: { ids: string[] }) {
                     {dateLabel(progress.review.dueDate)}
                   </span>
                 )}
+                {progress?.reference && (
+                  <span className="review-dates">
+                    Reference{' '}
+                    {progress.reference.solidAt
+                      ? 'solid'
+                      : `${progress.reference.successfulRecallStreak} of 3`}
+                  </span>
+                )}
               </div>
               <span className={`status ${status(progress)}`}>
                 {STATUS_LABELS[status(progress)]}

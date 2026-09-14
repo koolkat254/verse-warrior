@@ -59,6 +59,9 @@ export function AppProvider({
     const onStorage = (event: StorageEvent) => {
       if (event.key === STORAGE_KEY || event.key === null) update();
     };
+    const onVisibilityChange = () => {
+      if (!document.hidden) update();
+    };
     let midnightTimer: number;
     const scheduleMidnight = () => {
       const current = new Date(),
@@ -70,16 +73,14 @@ export function AppProvider({
       }, midnight.getTime() - current.getTime());
     };
     scheduleMidnight();
-    const timer = window.setInterval(update, 30_000);
     window.addEventListener('storage', onStorage);
     window.addEventListener('focus', update);
-    document.addEventListener('visibilitychange', update);
+    document.addEventListener('visibilitychange', onVisibilityChange);
     return () => {
-      clearInterval(timer);
       clearTimeout(midnightTimer);
       window.removeEventListener('storage', onStorage);
       window.removeEventListener('focus', update);
-      document.removeEventListener('visibilitychange', update);
+      document.removeEventListener('visibilitychange', onVisibilityChange);
     };
   }, []);
   const change = useCallback(

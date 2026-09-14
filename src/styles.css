@@ -759,6 +759,24 @@ textarea::placeholder {
   font-size: 0.86rem;
   color: var(--muted);
 }
+.reference-recall .scripture {
+  margin-top: 0;
+}
+.reference-prompt {
+  text-align: center;
+  padding-top: 8px;
+}
+.reference-prompt p {
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+.reference-prompt .button {
+  margin-top: 10px;
+}
+.reference-rating-buttons {
+  grid-template-columns: repeat(2, 1fr);
+  margin-top: 20px;
+}
 .session-progress {
   display: flex;
   justify-content: space-between;
@@ -1019,8 +1037,11 @@ dd {
     padding: 8px 12px;
   }
   .main {
-    padding: 34px 22px 48px;
+    padding: 34px 22px calc(112px + env(safe-area-inset-bottom));
     min-height: calc(100vh - 206px);
+  }
+  .practice-main {
+    padding-bottom: calc(48px + env(safe-area-inset-bottom));
   }
   .page-heading {
     margin-bottom: 28px;
@@ -1092,7 +1113,7 @@ dd {
     font-size: 0.78rem;
   }
   .site-footer {
-    margin: 0 22px 90px;
+    margin: 0 22px max(24px, env(safe-area-inset-bottom));
     padding: 22px 0;
   }
   .section-heading {
