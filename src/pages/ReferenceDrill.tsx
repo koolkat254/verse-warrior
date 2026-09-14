@@ -21,6 +21,36 @@ function shuffle<T>(items: readonly T[]): T[] {
   }
   return result;
 }
+
+function randomIndex(length: number, excludedIndex?: number): number {
+  if (length < 2 || excludedIndex === undefined || excludedIndex < 0 || excludedIndex >= length) {
+    return Math.floor(Math.random() * length);
+  }
+
+  const selection = Math.floor(Math.random() * (length - 1));
+  return selection >= excludedIndex ? selection + 1 : selection;
+}
+
+function savedRound(scope: string, passageCount: number): number {
+  const key = `verse-warrior:reference-drill:${scope}`;
+  try {
+    const previous = Number.parseInt(sessionStorage.getItem(key) ?? '', 10);
+    const round = randomIndex(passageCount, Number.isInteger(previous) ? previous : undefined);
+    sessionStorage.setItem(key, String(round));
+    return round;
+  } catch {
+    return randomIndex(passageCount);
+  }
+}
+
+function saveRound(scope: string, round: number): void {
+  try {
+    sessionStorage.setItem(`verse-warrior:reference-drill:${scope}`, String(round));
+  } catch {
+    // The drill still works when browser storage is unavailable.
+  }
+}
+
 function RoundFooter({ onNext }: { onNext: () => void }) {
   return (
     <button className="button" onClick={onNext}>
@@ -55,6 +85,9 @@ function ChooseReference({
         <p className="eyebrow">Choose the reference</p>
         <Scripture passage={passage} />
         <p className="muted">Which reference belongs with these words?</p>
+        <button className="text-button" onClick={onNext}>
+          Use a different verse
+        </button>
         <div className="drill-choices">
           {options.map((option) => (
             <button
@@ -155,6 +188,9 @@ function TypeReference({
       <label className="input-label" htmlFor="reference-attempt">
         Book, chapter, and verse
       </label>
+      <button className="text-button" onClick={onNext}>
+        Use a different verse
+      </button>
       <input
         id="reference-attempt"
         className="reference-input"
@@ -189,15 +225,18 @@ function TypeReference({
 export function ReferenceDrill() {
   const { catalog } = useApp();
   const { collectionId, groupId, mode } = useParams();
-  const [round, setRound] = useState(() => Math.floor(Math.random() * 10_000));
   const collection = catalog.collections.find((item) => item.id === collectionId);
   const group = collection && findGroup(collection, groupId);
   const validMode = modes.some((item) => item.id === mode) ? (mode as DrillMode) : null;
+  const passages = group
+    ? flatten(group)
+        .map((id) => catalog.passages.find((passage) => passage.id === id))
+        .filter((passage): passage is Passage => !!passage)
+    : [];
+  const scope = `${collection?.id ?? 'unknown'}:${groupId ?? 'collection'}:${validMode ?? 'unknown'}`;
+  const [round, setRound] = useState(() => savedRound(scope, Math.max(passages.length, 1)));
   if (!collection || !group || !validMode)
     return <Recovery message="We could not find this reference drill." />;
-  const passages = flatten(group)
-    .map((id) => catalog.passages.find((passage) => passage.id === id))
-    .filter((passage): passage is Passage => !!passage);
   if (!passages.length)
     return <Recovery message="This group does not have passages to practice yet." />;
   if (validMode === 'match' && passages.length < 2)
@@ -205,7 +244,14 @@ export function ReferenceDrill() {
   const base = groupId
     ? `/reference/${collection.id}/groups/${groupId}`
     : `/reference/${collection.id}`;
-  const next = () => setRound((current) => (current + 1) % passages.length);
+  const next = () =>
+    setRound((current) => {
+      if (passages.length < 2) return current;
+      const currentIndex = current % passages.length;
+      const nextRound = randomIndex(passages.length, currentIndex);
+      saveRound(scope, nextRound);
+      return nextRound;
+    });
   return (
     <>
       <Link className="exit-practice" to={`/collections/${collection.id}`}>

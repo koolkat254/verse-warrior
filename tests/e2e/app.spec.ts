@@ -154,6 +154,16 @@ test('offers choose, match, and type reference drills for a group', async ({ pag
     page.getByRole('heading', { name: /That is right|Check the reference/ }),
   ).toBeVisible();
 });
+test('reference drills choose a different passage when revisited or advanced', async ({ page }) => {
+  await page.goto('./#/reference/foundations/groups/book-one/type');
+  const scripture = page.locator('.reference-drill-card .scripture');
+  const firstPassage = await scripture.innerText();
+  await page.reload();
+  await expect(scripture).not.toHaveText(firstPassage);
+  const reloadedPassage = await scripture.innerText();
+  await page.getByRole('button', { name: 'Use a different verse' }).click();
+  await expect(scripture).not.toHaveText(reloadedPassage);
+});
 test('adds a separate reference check without exposing its answer first', async ({ page }) => {
   await seedDue(page);
   await page.evaluate((key) => {
