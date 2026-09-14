@@ -85,6 +85,27 @@ export function ProgressCounts({ ids }: { ids: string[] }) {
           </div>
         ))}
       </div>
+      <details className="progress-definitions">
+        <summary>What do these mean?</summary>
+        <dl>
+          <div>
+            <dt>Not started</dt>
+            <dd>You have not opened this passage yet.</dd>
+          </div>
+          <div>
+            <dt>Learning</dt>
+            <dd>You have practiced it, but have not started scheduled review.</dd>
+          </div>
+          <div>
+            <dt>Reviewing</dt>
+            <dd>It is in your spaced-review rhythm.</dd>
+          </div>
+          <div>
+            <dt>Mastered</dt>
+            <dd>You have recalled it successfully over time. Reviews continue.</dd>
+          </div>
+        </dl>
+      </details>
     </div>
   );
 }

@@ -170,7 +170,12 @@ test('keyboard shortcuts reveal, rate, and advance a review without affecting ty
   await expect(page.getByLabel('Your recall attempt')).toHaveValue('1 ');
   await expect(page.getByRole('button', { name: 'Reveal and compare' })).toBeVisible();
 });
-test('simultaneous tabs cannot rate the same scheduled review twice', async ({ page, context }) => {
+test('simultaneous tabs cannot rate the same scheduled review twice', async ({
+  page,
+  context,
+  browserName,
+}) => {
+  test.skip(browserName !== 'chromium', 'Web Locks are not available in this browser target.');
   await seedDue(page);
   await page.goto('./#/review');
   const second = await context.newPage();

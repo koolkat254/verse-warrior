@@ -1,13 +1,49 @@
-import { useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { compareWords, firstLetter, tokens, wordOrder } from '../domain/text';
 
 export function WordHints({ text, letters = false }: { text: string; letters?: boolean }) {
-  const parts = tokens(text);
-  const words = parts.filter((p) => /[\p{L}\p{N}]/u.test(p));
+  const parts = useMemo(() => tokens(text), [text]);
+  const words = useMemo(() => parts.filter((p) => /[\p{L}\p{N}]/u.test(p)), [parts]);
   const [order, setOrder] = useState(() => wordOrder(words.length));
   const [level, setLevel] = useState(25);
   const [revealed, setRevealed] = useState<Set<number>>(() => new Set());
-  const hidden = new Set(order.slice(0, Math.ceil((words.length * level) / 100)));
+  const hidden = useMemo(
+    () => new Set(order.slice(0, Math.ceil((words.length * level) / 100))),
+    [level, order, words.length],
+  );
+  const revealNextHint = useCallback(() => {
+    setRevealed((current) => {
+      const next = Array.from({ length: words.length }, (_, index) => index).find(
+        (index) => (letters || hidden.has(index)) && !current.has(index),
+      );
+      return next === undefined ? current : new Set([...current, next]);
+    });
+  }, [hidden, letters, words.length]);
+  const hasNextHint = Array.from({ length: words.length }, (_, index) => index).some(
+    (index) => (letters || hidden.has(index)) && !revealed.has(index),
+  );
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      const typing =
+        event.target instanceof HTMLInputElement ||
+        event.target instanceof HTMLTextAreaElement ||
+        event.target instanceof HTMLSelectElement ||
+        (event.target instanceof HTMLElement && event.target.isContentEditable);
+      if (
+        typing ||
+        event.altKey ||
+        event.ctrlKey ||
+        event.metaKey ||
+        !hasNextHint ||
+        (event.key !== ' ' && event.key !== 'ArrowRight')
+      )
+        return;
+      event.preventDefault();
+      revealNextHint();
+    }
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [hasNextHint, revealNextHint]);
   let index = -1;
   return (
     <div>
@@ -45,6 +81,7 @@ export function WordHints({ text, letters = false }: { text: string; letters?: b
           : 'Read the passage aloud, filling in the hidden words.'}{' '}
         Tap a hint to reveal a word.
       </p>
+      <p className="shortcut-hint">Keyboard: Space or Right Arrow reveals the next hidden word.</p>
       <div className="scripture hinted-text">
         {parts.map((part, position) => {
           if (!/[\p{L}\p{N}]/u.test(part)) return <span key={position}>{part}</span>;

@@ -94,11 +94,16 @@ export function duePassageIds(catalog: Catalog, state: ProgressState, now: Date)
 export function referencePassageIds(
   catalog: Catalog,
   state: ProgressState,
+  now: Date,
   excludedIds: readonly string[] = [],
 ): string[] {
   const excluded = new Set(excludedIds);
+  const today = localDay(now);
   return activePassageIds(catalog, state)
-    .filter((id) => state.passageProgress[id]?.review && !excluded.has(id))
+    .filter((id) => {
+      const review = state.passageProgress[id]?.review;
+      return review && !excluded.has(id) && localDay(new Date(review.lastReviewedAt)) !== today;
+    })
     .sort((a, b) => {
       const first = state.passageProgress[a].reference;
       const second = state.passageProgress[b].reference;

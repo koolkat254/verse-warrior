@@ -29,6 +29,14 @@ describe('learning interactions', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Reveal word 1' }));
     expect(document.body.textContent).toContain('Steady');
   });
+  it('reveals the next concealed word with Space or Right Arrow', async () => {
+    render(<WordHints text="Steady practice builds memory." />);
+    await userEvent.click(screen.getByRole('button', { name: '100%' }));
+    await userEvent.keyboard('{ArrowRight}');
+    expect(document.body.textContent).toContain('Steady');
+    await userEvent.keyboard(' ');
+    expect(document.body.textContent).toContain('practice');
+  });
   it('does not compare a typed attempt before submission', async () => {
     render(<Typing text="One two three." />);
     expect(document.body.textContent).not.toContain('One two three');

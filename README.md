@@ -40,8 +40,8 @@ End-to-end tests build a separate `dist-test` from synthetic, non-Scripture fixt
 - Opening a learning exercise marks a passage as Learning. Selecting **Ready to review** begins an initial recall; submitting that rating schedules tomorrow's review without mastery credit.
 - Scheduled word reviews use 1, 3, 7, 14, 30, and 60-day intervals. Remembered advances one step, Needed help moves back one, and Forgot returns to one day.
 - Word mastery requires three consecutive successful scheduled reviews, including a completed interval of at least seven days. A Needed help or Forgot rating removes mastery; reviews continue afterward.
-- A review session contains up to five word-recall cards, followed by up to two reference cards for passages whose words were not shown in that session. Reference recall has its own three-success **solid** signal and does not affect word mastery or scheduling.
-- On a physical keyboard, Space or Enter reveals an answer and advances after a rating. Word cards use `1`, `2`, and `3` for Remembered, Needed help, and Forgot. Reference cards use `1` and `2`. Shortcuts do not apply while the learner is typing.
+- A review session contains up to five word-recall cards, followed by up to two reference cards for passages whose words were not shown in that session or reviewed earlier that day. Reference recall has its own three-success **solid** signal and does not affect word mastery or scheduling.
+- In word-hint and first-letter exercises, Space or Right Arrow reveals the next concealed word. During review, Space or Enter reveals an answer and advances after a rating. Word cards use `1`, `2`, and `3` for Remembered, Needed help, and Forgot. Reference cards use `1` and `2`. Shortcuts do not apply while the learner is typing.
 
 ## Progress, backup, and privacy
 

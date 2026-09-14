@@ -238,7 +238,9 @@ describe('progress and queues', () => {
       expected: 'null',
       now: at('2026-01-01'),
     });
-    expect(referencePassageIds(catalog, state, ['practice-one'])).toEqual(['practice-two']);
+    expect(referencePassageIds(catalog, state, at('2026-01-02'), ['practice-one'])).toEqual([
+      'practice-two',
+    ]);
     state = progressReducer(state, {
       type: 'rate-reference',
       id: 'practice-two',

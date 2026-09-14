@@ -14,7 +14,7 @@ export function ReviewSession() {
   const { catalog, state, now, warning } = useApp();
   const [queue] = useState(() => {
     const wordIds = duePassageIds(catalog, state, now).slice(0, REVIEW_BATCH_SIZE);
-    const referenceIds = referencePassageIds(catalog, state, wordIds).slice(
+    const referenceIds = referencePassageIds(catalog, state, now, wordIds).slice(
       0,
       REFERENCE_BATCH_SIZE,
     );
